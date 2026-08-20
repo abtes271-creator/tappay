@@ -1,0 +1,31 @@
+# Backend build output - must never be committed. Stale/mismatched compiled
+# classes checked into git are what caused java.lang.NoClassDefFoundError for
+# newly-added DTOs (e.g. CardAdminView): whatever was last committed here could
+# silently shadow a fresh `mvn clean package` output depending on tooling/deploy
+# scripts. Always do a clean rebuild instead of relying on committed artifacts.
+target/
+backend/target/
+*.class
+
+# Frontend build output & deps
+node_modules/
+dist/
+frontend/dist/
+frontend/node_modules/
+
+# Env files
+.env
+.env.local
+*.env.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

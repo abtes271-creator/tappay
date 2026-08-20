@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: tap-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # Override any application.properties key here, e.g.:
+      # SPRING_DATASOURCE_URL: jdbc:sqlserver://db:1433;databaseName=tapdb;encrypt=true;trustServerCertificate=true
+      ADMIN_SEED_USERNAME: ${ADMIN_SEED_USERNAME:-admin}
+      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD:-ChangeMe123!}
+      ADMIN_SEED_EMAIL: ${ADMIN_SEED_EMAIL:-admin@example.com}
+
+      # --- Email (approvals, payments, password reset) ---
+      # These MUST be set to real values or no email will actually send.
+      # For Gmail: MAIL_USERNAME is your address, MAIL_PASSWORD is a 16-char
+      # "app password" from https://myaccount.google.com/apppasswords (NOT
+      # your normal Gmail password - that will be rejected).
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      ADMIN_NOTIFICATION_EMAIL: ${ADMIN_NOTIFICATION_EMAIL:-admin@example.com}
+      ADMIN_NOTIFICATION_PHONE: ${ADMIN_NOTIFICATION_PHONE:-}
+
+      # --- SMS (Twilio payment confirmations) ---
+      # Get these from https://console.twilio.com - leave blank to disable SMS.
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+
+      # Public URL of the frontend, used to build the link inside
+      # password-reset emails. Change this to your real deployed URL.
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: tap-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

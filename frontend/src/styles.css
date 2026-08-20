@@ -1,0 +1,2414 @@
+:root {
+  --bg-0: #f5f7f5;
+  --bg-1: #ffffff;
+  --surface: #ffffff;
+  --surface-solid: #ffffff;
+  --border: rgba(13, 27, 30, 0.09);
+  --border-hover: rgba(14, 124, 116, 0.45);
+  --text: #0b1717;
+  --muted: #5b6b6c;
+  --muted-2: #93a2a2;
+
+  /* Brand jade - the interactive/trust color throughout the app. Deepened
+     and slightly more saturated than a generic "teal" so it reads as a
+     deliberate brand color, not a Bootstrap default. */
+  --accent: #0e7c74;
+  --accent-2: #17c9a8;
+  --accent-solid: #084e49;
+  /* Near-black jade - the deep anchor for hero/mesh gradients, so dark
+     panels feel like "ink", not just a darker version of the button color. */
+  --accent-deep: #05211f;
+
+  /* Card gold - the signature accent, a direct nod to the physical NFC
+     card's chip. Used sparingly: the wallet card, tap-terminal glow, and
+     a handful of premium touches. Never used for interactive elements
+     that also need to look clickable (that stays jade). */
+  --gold: #cb9a3d;
+  --gold-light: #f0d6a0;
+  --gold-deep: #8f6b21;
+  --ink: #0b1717;
+  --ink-2: #142523;
+
+  --success: #16a34a;
+  --danger: #dc2626;
+  --danger-solid: #b91c1c;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow-lg: 0 10px 26px -14px rgba(11, 23, 23, 0.16);
+  --shadow-glow: 0 0 0 1px rgba(14, 124, 116, 0.06), 0 8px 18px -10px rgba(14, 124, 116, 0.16);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+/* Without this, a rapid double-click/double-tap on a button is very
+   commonly swallowed by the browser's own default gesture handling before
+   it ever reaches our onClick/onDoubleClick handlers - most notably
+   double-tap-to-zoom on mobile/tablet browsers (exactly the kind of device
+   a tap-to-pay counter terminal runs on), and a ~300ms tap-delay on older
+   mobile browsers that can make two fast taps register as a zoom instead
+   of two clicks. `touch-action: manipulation` tells the browser this
+   element is meant to be tapped/clicked, not panned or zoomed, which
+   removes that delay and stops the double-tap-to-zoom gesture from
+   hijacking the interaction. This is what was silently breaking
+   "double-click an item to pay" even though the click handlers themselves
+   were correct.  */
+button, a, .item-tile, .quick-action-tile, .stat-tile {
+  touch-action: manipulation;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(720px 480px at -8% -12%, rgba(15, 118, 110, 0.07), transparent 60%),
+    radial-gradient(640px 420px at 108% 8%, rgba(200, 149, 46, 0.06), transparent 55%),
+    var(--bg-0);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(15, 118, 110, 0.35); color: #fff; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(147, 162, 162, 0.25); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(147, 162, 162, 0.4); }
+
+/* Keyboard focus must always be visible - never suppressed, only styled. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2.5px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 44px 20px 60px;
+  animation: fadeUp 0.45s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px 24px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-lg);
+}
+
+
+
+h1, h2, h3 {
+  margin-top: 0;
+  font-family: 'Sora', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+h1 {
+  font-size: 26px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #0e1a1c 0%, #084e49 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+h2 { font-size: 19px; font-weight: 700; }
+h3 { font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-size: 13px; }
+
+p { color: var(--muted); line-height: 1.55; }
+
+a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.15s ease; }
+a:hover { color: var(--accent-solid); text-decoration: underline; }
+
+label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(14, 26, 28, 0.14);
+  background: #ffffff;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+input::placeholder { color: var(--muted-2); }
+
+input:hover, select:hover { border-color: rgba(14, 26, 28, 0.25); }
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+select { cursor: pointer; }
+
+button {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  margin-top: 4px;
+  box-shadow: 0 8px 20px -8px rgba(15, 118, 110, 0.35);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease, opacity 0.12s ease;
+}
+
+button:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 12px 26px -8px rgba(15, 118, 110, 0.4); }
+button:active { transform: translateY(0); }
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+button.secondary {
+  background: #ffffff;
+  border: 1px solid rgba(14, 26, 28, 0.16);
+  box-shadow: none;
+  color: var(--text);
+}
+button.secondary:hover { background: #f4f7f6; border-color: rgba(14, 26, 28, 0.28); }
+
+button.danger {
+  background: linear-gradient(135deg, #770b0b 0%, #670f0f 100%);
+  box-shadow: 0 8px 20px -8px rgba(220, 38, 38, 0.3);
+}
+
+.error {
+  color: #991b1b;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.22);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.success {
+  color: #15803d;
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.22);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+/* Header row above the item grid on the Select Items screen: title/hint on
+   the left, a small item-count pill on the right so the page feels less
+   bare when there are only a couple of items and gives a quick sense of
+   scale once the catalog grows. */
+.terminal-select-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.terminal-item-count {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-solid);
+  background: rgba(15, 118, 110, 0.09);
+  border-radius: 999px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.terminal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.terminal-empty-icon {
+  font-size: 32px;
+  opacity: 0.6;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 420px) {
+  .item-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Clickable item tile (Seller POS item selection): a single tap/click jumps
+   straight to the payment screen, so this is rendered as a real <button> -
+   explicitly overriding the generic button's white-on-gradient styling
+   (which would otherwise make the text unreadable on this tile's white
+   background) with normal, high-contrast text colors. */
+.item-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 400;
+  box-shadow: none;
+  margin-top: 0;
+  /* A double-click/double-tap on text defaults to selecting that text,
+     which can eat the second click of a double-click before it reaches
+     our onDoubleClick handler (most noticeable on desktop, where the
+     browser highlights the item name/price instead of firing the second
+     click). These tiles are buttons, not text to select, so turn it off. */
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.item-tile:hover { filter: none; transform: translateY(-3px); }
+.item-tile strong { color: var(--text); }
+
+/* Small round initial-letter badge so a grid of items has some visual
+   texture beyond flat text, without needing real product images. */
+.item-tile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--accent-solid);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.item-tile-name {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.3;
+  /* keep long item names from blowing out the tile width */
+  overflow-wrap: anywhere;
+}
+
+.item-tile-price {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent-solid);
+}
+
+.item-tile:hover {
+  border-color: var(--border-hover);
+  background: rgba(15, 118, 110, 0.05);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px -12px rgba(15, 118, 110, 0.3);
+}
+
+.item-tile.selected {
+  border-color: var(--accent);
+  background: rgba(15, 118, 110, 0.08);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+}
+
+/* Small checkmark badge shown top-right on a tile once it's added to the
+   basket - a quick, obvious "this one's in your order" signal at a glance
+   across a whole grid of items. */
+.item-tile-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 2px 6px -1px rgba(15, 118, 110, 0.5);
+  animation: checkPop 0.18s ease both;
+}
+
+@keyframes checkPop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Once quantity is 2+, the badge shows "×N" instead of a checkmark, so let
+   it grow horizontally instead of staying pinned to a circle. */
+.item-tile-check.item-tile-qty {
+  width: auto;
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+}
+
+/* Small "remove one" control shown top-left on a selected tile, mirroring
+   the quantity badge on the opposite corner. Stops its own click/keydown
+   from bubbling up to the tile's "add one" handler. */
+.item-tile-decrement {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+.item-tile-decrement:hover {
+  border-color: var(--accent);
+  color: var(--accent-solid);
+}
+
+.tap-circle {
+  position: relative;
+  width: 208px;
+  height: 208px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 48px auto;
+  text-align: center;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.03em;
+  font-family: 'Sora', sans-serif;
+  cursor: pointer;
+  color: #ffffff;
+  background: radial-gradient(circle at 32% 28%, var(--ink-2) 0%, var(--ink) 72%);
+  border: 2px solid rgba(231, 195, 116, 0.55);
+  box-shadow: 0 18px 40px -18px rgba(14, 26, 28, 0.55), inset 0 0 0 1px rgba(231, 195, 116, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+/* Concentric "contactless" wave rings pulsing outward from the disc, in the
+   signature card-gold tone - the literal symbol of a tap payment. */
+.tap-circle::before,
+.tap-circle::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(231, 195, 116, 0.55);
+  pointer-events: none;
+  animation: tapWave 2.8s cubic-bezier(0.2, 0.7, 0.4, 1) infinite;
+}
+.tap-circle::after { animation-delay: 1.4s; }
+
+@keyframes tapWave {
+  0% { transform: scale(1); opacity: 0.65; }
+  100% { transform: scale(1.34); opacity: 0; }
+}
+
+.tap-circle:hover {
+  transform: scale(1.02);
+  border-color: var(--gold-light);
+}
+
+.tap-circle-icon { font-size: 26px; line-height: 1; }
+.tap-circle-icon-svg { display: block; margin: 0 auto; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+nav.topnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+
+nav.topnav span { color: var(--muted); font-weight: 600; }
+nav.topnav span strong, nav.topnav span b { color: var(--text); }
+
+nav.topnav a, nav.topnav button {
+  color: var(--accent);
+  background: none;
+  border: none;
+  box-shadow: none;
+  width: auto;
+  padding: 6px 10px;
+  margin: 0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+nav.topnav button:hover { transform: none; filter: none; color: var(--accent-solid); background: rgba(15, 118, 110, 0.08); border-radius: 8px; }
+
+.balance {
+  font-family: 'Sora', sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #084e49, #cb9a3d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 420px) {
+  .page { padding: 28px 14px 48px; }
+  .card { padding: 20px 18px; }
+  .tap-circle { width: 170px; height: 170px; }
+}
+
+/* ---- Wider page variant for data-dense admin/institution screens ----
+   Sized to use real desktop real estate (a proper website layout) rather
+   than a narrow mobile-style column, while still centering nicely and
+   collapsing gracefully via the .page media queries on small screens. */
+.page-wide { max-width: 1220px; }
+
+@media (min-width: 1400px) {
+  .page-wide { max-width: 1320px; }
+}
+
+/* Keeps a single form/stat card at a readable width even inside the wide
+   desktop container, instead of stretching a short form edge-to-edge. */
+.card-narrow { max-width: 560px; margin-left: auto; margin-right: auto; }
+
+/* ---- Generic helpers ---- */
+.muted { color: var(--muted); font-size: 13.5px; }
+.muted-empty { color: var(--muted-2); font-size: 13.5px; font-style: italic; padding: 6px 0; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+}
+
+/* =========================================================
+   Virtual wallet card - the signature visual on the customer's
+   home screen. Styled like the physical NFC card itself: ink-navy
+   body, a gold chip, and an embossed balance line.
+   ========================================================= */
+.wallet-card {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 18px;
+  padding: 26px 26px 22px;
+  border-radius: 22px;
+  color: #ffffff;
+  background: radial-gradient(circle at 85% -10%, rgba(231, 195, 116, 0.16), transparent 55%),
+              linear-gradient(155deg, var(--ink-2) 0%, var(--ink) 62%, #071012 100%);
+  box-shadow: 0 22px 44px -20px rgba(14, 26, 28, 0.55), inset 0 0 0 1px rgba(231, 195, 116, 0.14);
+}
+
+/* Faint diagonal sheen, like light catching a card's laminate */
+.wallet-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0%, transparent 30%);
+  pointer-events: none;
+}
+
+.wallet-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.wallet-card-chip {
+  width: 38px;
+  height: 30px;
+  border-radius: 7px;
+  background: linear-gradient(155deg, var(--gold-light), var(--gold) 70%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  position: relative;
+}
+.wallet-card-chip::before {
+  content: '';
+  position: absolute;
+  inset: 5px 4px;
+  border: 1px solid rgba(14, 26, 28, 0.35);
+  border-radius: 3px;
+}
+
+.wallet-card-tag {
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(231, 195, 116, 0.9);
+}
+
+.wallet-card-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 4px;
+}
+
+.wallet-balance-figure {
+  font-family: 'Sora', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+  /* Cancel the global h1 gradient-text treatment (background-clip text +
+     transparent fill) so this renders as solid white, not the dark
+     ink->teal gradient meant for headings on light backgrounds. */
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+  animation: balancePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.balance-toggle-light {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+.balance-toggle-light:hover { background: rgba(255, 255, 255, 0.16); }
+
+.wallet-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.wallet-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+}
+.wallet-card-sub { font-size: 11.5px; color: rgba(255, 255, 255, 0.5); margin-top: 2px; }
+
+@media (max-width: 420px) {
+  .wallet-card { padding: 22px 20px 18px; }
+  .wallet-balance-figure { font-size: 32px; }
+}
+
+.balance-card { text-align: left; }
+.balance-figure {
+  font-family: 'Sora', sans-serif;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 6px 0 2px;
+  background: linear-gradient(135deg, #084e49, #cb9a3d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: balancePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes balancePop {
+  from { opacity: 0; transform: scale(0.92) translateY(6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ---- List rows shared by admin pending/cards lists ---- */
+.list-row {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  animation: fadeUp 0.35s ease both;
+}
+.list-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.row-sub { font-size: 12.5px; color: var(--muted-2); margin-top: 2px; }
+
+/* A clearly-visible ID badge for admin list tables - IDs used to be buried
+   in low-contrast .row-sub text next to the username, which made them hard
+   to spot/read at a glance. This gives them their own high-contrast chip. */
+.id-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'SFMono-Regular', ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent-solid);
+  background: rgba(15, 118, 110, 0.1);
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 7px;
+  padding: 2px 8px;
+  margin-top: 4px;
+  letter-spacing: 0.01em;
+}
+
+/* ---- Skeleton loading state ---- */
+.skeleton-list { display: flex; flex-direction: column; gap: 10px; }
+.skeleton-row {
+  height: 52px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, rgba(15,23,42,0.05) 25%, rgba(15,23,42,0.10) 37%, rgba(15,23,42,0.05) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* ---- Transaction list ---- */
+.tx-list { display: flex; flex-direction: column; }
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp 0.4s ease both;
+}
+.tx-row:last-child { border-bottom: none; }
+
+.tx-icon {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+.tx-icon-credit { background: rgba(22, 163, 74, 0.12); color: #15803d; }
+.tx-icon-debit { background: rgba(220, 38, 38, 0.12); color: #b91c1c; }
+
+.tx-main { flex: 1 1 auto; min-width: 0; }
+.tx-main strong { display: block; font-size: 14.5px; color: var(--text); }
+.tx-time { font-size: 12px; color: var(--muted-2); margin-top: 2px; }
+
+.tx-amount-wrap { text-align: right; flex: 0 0 auto; }
+.tx-amount { font-weight: 700; font-size: 14.5px; font-family: 'Sora', sans-serif; }
+.tx-amount-credit { color: #15803d; }
+.tx-amount-debit { color: var(--text); }
+
+.tx-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+.tx-badge-ok { color: #15803d; background: rgba(22, 163, 74, 0.1); }
+.tx-badge-fail { color: #b91c1c; background: rgba(220, 38, 38, 0.1); }
+.tx-badge-pending { color: #92400e; background: rgba(217, 119, 6, 0.12); }
+
+/* ---- Modal / popup ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 26, 28, 0.35);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  animation: overlayIn 0.2s ease both;
+}
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-box {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  padding: 24px;
+  animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.modal-close {
+  width: auto;
+  padding: 4px 10px;
+  background: rgba(14, 26, 28, 0.06);
+  box-shadow: none;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.modal-hint { font-size: 13px; margin-top: -4px; margin-bottom: 12px; }
+
+/* ---- Admin card-provisioning forms ---- */
+.add-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 14px 0 20px;
+}
+.add-card-form {
+  background: #f4f7f6;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.add-card-form input[type="file"] {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.add-card-form code {
+  background: rgba(14, 26, 28, 0.07);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .add-card-grid { grid-template-columns: 1fr; }
+}
+
+/* =========================================================
+   Wide, multi-column field grid for data-entry forms (e.g. Manage
+   Admins "Add a new admin") - each label+input pair is a single
+   grid item so it wraps into 2-3 columns on desktop instead of one
+   long, empty-feeling column. Wrap each pair in a .form-field div;
+   give full-width items (headings, alerts, the submit button)
+   .form-field-full so they span every column.
+   ========================================================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 4px 20px;
+  align-items: start;
+}
+.form-field { display: flex; flex-direction: column; }
+.form-field label { margin-bottom: 6px; }
+.form-field input, .form-field select { margin-bottom: 0; }
+.form-field-full { grid-column: 1 / -1; }
+.form-grid button[type="submit"] { width: auto; min-width: 220px; margin-top: 6px; }
+
+/* =========================================================
+   ipay brand mark
+   ========================================================= */
+.ipay-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1;
+}
+.ipay-logo-mark { flex: 0 0 auto; border-radius: 30%; }
+.ipay-logo-word {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.ipay-logo-accent {
+  background: linear-gradient(135deg, #f0d6a0, #cb9a3d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+/* =========================================================
+   Auth split-screen shell (Login / Register) - a proper desktop
+   website layout: a brand/hero panel on the left, the form on the
+   right. Collapses to a single stacked column on small screens.
+   ========================================================= */
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 24px;
+  /* Same page background as the rest of the app (see body{}), so the split
+     screen reads as "two cards on a page" rather than a full-bleed color
+     block butting up against the browser edge. */
+  background:
+    radial-gradient(720px 480px at -8% -12%, rgba(15, 118, 110, 0.07), transparent 60%),
+    radial-gradient(640px 420px at 108% 8%, rgba(200, 149, 46, 0.06), transparent 55%),
+    var(--bg-0);
+  padding: 24px;
+  animation: fadeUp 0.45s ease both;
+}
+
+.auth-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  padding: 64px 64px;
+  color: #f2f7f6;
+  background:
+    radial-gradient(560px 380px at 12% 10%, rgba(240, 214, 160, 0.24), transparent 62%),
+    radial-gradient(620px 460px at 92% 88%, rgba(23, 201, 168, 0.30), transparent 60%),
+    radial-gradient(900px 620px at 50% 120%, rgba(5, 33, 31, 0.9), transparent 65%),
+    linear-gradient(155deg, #0e7c74 0%, #0a4a45 58%, #05211f 130%);
+  /* Visible (not hidden): the floating tap-card illustration (.auth-hero-art)
+     intentionally bleeds slightly past this panel's bottom-right edge for a
+     "resting on the corner" effect. The dotted ::after texture below is
+     inset:0 so it's unaffected either way. */
+  overflow: visible;
+  /* Matches the app's card component (same radius + shadow language as
+     .card) instead of a flat, un-bounded panel bleeding to the viewport edge. */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.auth-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.35) 1px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 70% 65%, rgba(255,255,255,0.25) 1px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.2) 1px, transparent 1px),
+    radial-gradient(1.5px 1.5px at 85% 20%, rgba(255,255,255,0.3) 1px, transparent 1px);
+  pointer-events: none;
+}
+
+.auth-hero-brand { position: relative; }
+.auth-hero-brand .ipay-logo-word,
+.auth-hero-brand .ipay-logo-accent { color: #ffffff; -webkit-text-fill-color: #ffffff; }
+.auth-hero-brand .ipay-logo-accent { background: none; }
+
+.auth-hero-title {
+  position: relative;
+  font-family: 'Sora', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+  max-width: 460px;
+  /* Same root cause as .welcome-title: the global `h1` rule below paints
+     text with a dark-green gradient via background-clip + a transparent
+     fill, which isn't overridden just by setting `color`. That's why
+     "Tap. Pay." rendered near-invisible dark-on-dark while "Done." faded
+     into the lighter end of the same gradient. Force a solid, opaque
+     white here instead. */
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.auth-hero-subtitle {
+  position: relative;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: rgba(242, 247, 246, 0.78);
+  max-width: 420px;
+  margin: 0;
+  animation: authFadeSlideIn 0.5s ease both 0.1s;
+}
+
+.auth-hero-features {
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@keyframes authFadeSlideIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authIconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.auth-hero-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14.5px;
+  color: rgba(242, 247, 246, 0.92);
+  opacity: 0;
+  animation: authFadeSlideIn 0.55s ease both;
+}
+
+/* Staggered entrance so each line animates in one after another instead of
+   all at once - the paragraphs feel alive rather than static. */
+.auth-hero-features li:nth-child(1) { animation-delay: 0.25s; }
+.auth-hero-features li:nth-child(2) { animation-delay: 0.4s; }
+.auth-hero-features li:nth-child(3) { animation-delay: 0.55s; }
+.auth-hero-features li:nth-child(4) { animation-delay: 0.7s; }
+
+.auth-hero-features li span.icon {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 16px;
+  animation: authIconPulse 2.6s ease-in-out infinite;
+}
+
+.auth-hero-features li:nth-child(2) span.icon { animation-delay: 0.4s; }
+.auth-hero-features li:nth-child(3) span.icon { animation-delay: 0.8s; }
+
+/* ---- Floating tap-card illustration (decorative, hero signature element) ---- */
+.auth-hero-art {
+  position: absolute;
+  right: -18px;
+  bottom: -22px;
+  width: 380px;
+  max-width: 46%;
+  pointer-events: none;
+  opacity: 0;
+  animation: authFadeSlideIn 0.7s ease both 0.35s, artFloat 6s ease-in-out infinite 1.05s;
+}
+
+.auth-hero-art-svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.art-card-back {
+  filter: drop-shadow(0 14px 24px rgba(6, 16, 17, 0.35));
+}
+
+.art-card-front {
+  transform-origin: 133px 82px;
+  filter: drop-shadow(0 20px 34px rgba(6, 16, 17, 0.45));
+  animation: artCardTilt 6s ease-in-out infinite 1.05s;
+}
+
+.art-card-sheen {
+  animation: artSheenSweep 5s ease-in-out infinite 1.6s;
+}
+
+.art-ripple {
+  transform-origin: center;
+  opacity: 0;
+  animation: artRipple 2.6s ease-out infinite;
+}
+.art-ripple-2 { animation-delay: 0.5s; }
+.art-ripple-3 { animation-delay: 1s; }
+
+@keyframes artFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes artCardTilt {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(-3deg); }
+}
+
+@keyframes artSheenSweep {
+  0% { transform: translateX(-40px) rotate(22deg); opacity: 0; }
+  15% { opacity: 1; }
+  45% { opacity: 0; }
+  100% { transform: translateX(260px) rotate(22deg); opacity: 0; }
+}
+
+@keyframes artRipple {
+  0% { r: 6; opacity: 0.85; }
+  70% { opacity: 0; }
+  100% { r: 46; opacity: 0; }
+}
+
+@media (max-width: 900px) {
+  .auth-hero-art { display: none; }
+}
+
+.auth-form-side {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 20px;
+  overflow: hidden;
+  /* Second half of the split screen gets the same card treatment as the
+     hero panel, so the two sides sit together as a matched pair of cards. */
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Thin jade-to-gold accent bar along the top edge - the two brand colors
+   meeting in one hairline, a quiet echo of the card-chip motif without
+   repeating the hero's teal panel. */
+.auth-form-side::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 45%, var(--gold-light) 78%, var(--gold) 100%);
+}
+
+/* Soft ambient glow in the corner, echoing the hero's mesh gradient at
+   near-zero strength so the two panels feel like one connected surface. */
+.auth-form-side::after {
+  content: '';
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  right: -140px;
+  bottom: -160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(23, 201, 168, 0.10), transparent 70%);
+  pointer-events: none;
+}
+
+.auth-form-side .page {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  animation: none;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-form-side .card { box-shadow: none; border: none; padding: 0; margin-bottom: 0; }
+
+.auth-welcome-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-solid);
+  background: rgba(14, 124, 116, 0.08);
+  border: 1px solid rgba(14, 124, 116, 0.16);
+  padding: 5px 11px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.auth-welcome-title {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.auth-welcome-sub {
+  margin: 0 0 26px;
+  font-size: 14.5px;
+}
+
+/* Input with a leading icon glyph - user/lock/mail/key context cues so the
+   form reads at a glance instead of as an undifferentiated stack of boxes. */
+.field-icon {
+  position: relative;
+}
+.field-icon svg {
+  position: absolute;
+  left: 14px;
+  top: 15px;
+  width: 18px;
+  height: 18px;
+  color: var(--muted-2);
+  pointer-events: none;
+  transition: color 0.15s ease;
+}
+.field-icon input { padding-left: 42px; }
+.field-icon input:focus + svg,
+.field-icon:focus-within svg { color: var(--accent); }
+
+.auth-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -4px 0 18px;
+  font-size: 13.5px;
+}
+
+.auth-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+.auth-remember input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.auth-trust-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border);
+  font-size: 12.5px;
+  color: var(--muted-2);
+}
+.auth-trust-strip svg { flex: 0 0 auto; color: var(--gold-deep); width: 16px; height: 16px; }
+
+/* ---- Standalone single-card auth pages (forgot / reset / change
+   credentials) - same brand language as the split-screen Login, scaled
+   down to one centered card since there's no hero copy to pair it with. ---- */
+.auth-standalone {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(560px 380px at 8% 8%, rgba(203, 154, 61, 0.08), transparent 60%),
+    radial-gradient(620px 460px at 96% 92%, rgba(23, 201, 168, 0.10), transparent 60%),
+    var(--bg-0);
+}
+.auth-standalone .page { padding: 0; margin: 0; width: 100%; max-width: 440px; }
+.auth-standalone .card {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 30px;
+}
+.auth-standalone .card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 45%, var(--gold-light) 78%, var(--gold) 100%);
+}
+.auth-standalone .auth-brand { justify-content: flex-start; margin-bottom: 22px; }
+
+.auth-icon-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-solid) 100%);
+  box-shadow: 0 8px 18px -8px rgba(14, 124, 116, 0.5);
+  color: #fff;
+}
+.auth-icon-badge svg { width: 22px; height: 22px; }
+
+@media (max-width: 900px) {
+  .auth-shell { grid-template-columns: 1fr; padding: 14px; gap: 14px; }
+  .auth-hero { padding: 48px 32px 40px; text-align: center; align-items: center; }
+  .auth-hero-brand { display: flex; justify-content: center; }
+  .auth-hero-title, .auth-hero-subtitle { max-width: 100%; }
+  .auth-hero-features { align-items: flex-start; max-width: 320px; margin-left: auto; margin-right: auto; }
+  .auth-form-side { padding: 36px 20px 56px; }
+}
+
+.terminal-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+/* =========================================================
+   Payment terminal (TapToPay) - kiosk layout: item grid on top,
+   a sticky checkout bar always visible at the bottom so the total
+   and Pay action never require scrolling back up, plus a clean
+   receipt-style summary on the tap screen.
+   ========================================================= */
+.terminal-page {
+  padding-bottom: 108px; /* clears the fixed checkout bar below */
+}
+
+.terminal-checkout-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -10px 26px -18px rgba(14, 26, 28, 0.28);
+}
+
+.terminal-checkout-bar .btn-primary,
+.terminal-checkout-bar button { margin-top: 0; }
+
+.terminal-checkout-summary {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.terminal-checkout-count {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.terminal-checkout-total {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.terminal-receipt {
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  background: rgba(15, 118, 110, 0.03);
+}
+
+.terminal-receipt li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--muted);
+  padding: 5px 0;
+}
+
+.terminal-receipt li:not(:last-child) {
+  border-bottom: 1px dashed rgba(14, 26, 28, 0.1);
+}
+
+/* =========================================================
+   Dashboard shell: dark left sidebar + slim white top bar,
+   modeled on an enterprise banking back-office layout (dark navy
+   tree nav, light content canvas, boxed inputs). Rendered by
+   TopNav.jsx as <aside class="app-sidebar"> + <header class="app-topbar">,
+   both fixed to the viewport - the :has() rule below shifts the
+   page content out of their way without every page needing to
+   know the sidebar exists.
+   ========================================================= */
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 272px;
+  background: linear-gradient(180deg, #12173a 0%, #0c1030 100%);
+  display: flex;
+  flex-direction: column;
+  z-index: 80;
+  transition: transform 0.22s ease;
+}
+
+.app-sidebar-brand {
+  display: flex;
+  align-items: center;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+.app-sidebar-brand:hover { text-decoration: none; opacity: 0.92; }
+.app-sidebar-brand .ipay-logo-word { color: #f2f5f5; -webkit-text-fill-color: #f2f5f5; }
+
+.app-sidebar-nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 10px 20px;
+}
+
+.app-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  margin: 1px 0;
+  border-radius: 9px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: rgba(242, 245, 245, 0.72);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.app-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  text-decoration: none;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+.app-sidebar-link.active {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.22), rgba(20, 184, 166, 0.08));
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 var(--accent-2);
+}
+
+.app-sidebar-dot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.55;
+}
+.app-sidebar-link.active .app-sidebar-dot { opacity: 1; background: var(--accent-2); }
+
+.app-sidebar-group-trigger { justify-content: flex-start; }
+.app-sidebar-caret {
+  margin-left: auto;
+  font-size: 10px;
+  opacity: 0.6;
+  transition: transform 0.15s ease;
+}
+.app-sidebar-caret.open { transform: rotate(180deg); }
+
+.app-sidebar-children {
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 2px 0 4px 22px;
+}
+
+.app-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 30, 0.5);
+  z-index: 70;
+  display: none;
+}
+
+/* ---- Top bar: slim white strip to the right of the sidebar,
+   holds the mobile menu toggle plus the account menu / logout ---- */
+.app-topbar {
+  position: fixed;
+  top: 0;
+  left: 272px;
+  right: 0;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 22px;
+  z-index: 60;
+}
+
+.app-topbar-hamburger {
+  display: none;
+  width: auto;
+  margin: 0;
+  padding: 8px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  font-size: 18px;
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.app-topbar-spacer { flex: 1 1 auto; }
+
+.app-nav-right {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.app-nav-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  margin: 0;
+  padding: 6px 10px 6px 6px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  border-radius: 999px;
+  color: var(--text);
+  cursor: pointer;
+}
+.app-nav-account:hover {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+  background: #f4f7f6;
+}
+
+.app-nav-avatar {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: white;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+}
+.app-nav-avatar-lg { width: 42px; height: 42px; font-size: 15px; }
+
+.app-nav-account-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+.app-nav-account-text strong { font-size: 13px; color: var(--text); }
+.app-nav-account-text span { font-size: 11px; color: var(--muted-2); }
+
+.app-nav-caret {
+  font-size: 11px;
+  color: var(--muted-2);
+  transition: transform 0.15s ease;
+}
+.app-nav-caret.open { transform: rotate(180deg); }
+
+.app-nav-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 250px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  padding: 14px;
+  z-index: 60;
+  animation: modalIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.app-nav-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.app-nav-dropdown-header strong { display: block; font-size: 14px; color: var(--text); }
+.app-nav-dropdown-role { font-size: 12px; color: var(--muted-2); margin-top: 1px; }
+
+.app-nav-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 10px;
+  margin: 0;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-decoration: none;
+}
+.app-nav-dropdown-item:hover {
+  background: rgba(15, 118, 110, 0.08);
+  transform: none;
+  filter: none;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+/* ---- Logout: always visible, never buried in a menu ---- */
+.app-nav-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  margin: 0;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 1.5px solid rgba(220, 38, 38, 0.3);
+  box-shadow: none;
+  color: #b91c1c;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+.app-nav-logout:hover {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: #dc2626;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+/* ---- Shift page content clear of the fixed sidebar + top bar.
+   :has() means every dashboard page (.page or .page-wide with a
+   <TopNav> inside it) gets this automatically - no per-page markup
+   needed - while pages without a sidebar (auth, forms) are untouched. ---- */
+.page:has(> .app-sidebar),
+.page-wide:has(> .app-sidebar) {
+  max-width: none;
+  margin: 0;
+  padding: 96px 36px 60px calc(272px + 36px);
+  min-height: 100vh;
+  background: #eef1f6;
+}
+
+@media (min-width: 1400px) {
+  .page-wide:has(> .app-sidebar) {
+    padding-left: calc(272px + 48px);
+    padding-right: 48px;
+  }
+  .page-wide:has(> .app-sidebar) > *:not(.app-sidebar):not(.app-topbar) {
+    max-width: 1320px;
+  }
+}
+
+@media (max-width: 900px) {
+  .app-sidebar { transform: translateX(-100%); }
+  .app-sidebar.mobile-open { transform: translateX(0); box-shadow: 0 0 0 100vw rgba(0,0,0,0); }
+  .app-sidebar-backdrop.visible { display: block; }
+  .app-topbar { left: 0; padding: 0 16px; }
+  .app-topbar-hamburger { display: inline-flex; align-items: center; justify-content: center; }
+  .app-nav-account-text { display: none; }
+  .app-nav-account { padding: 6px; }
+  .app-nav-logout { padding: 7px 12px; font-size: 12.5px; }
+
+  .page:has(> .app-sidebar),
+  .page-wide:has(> .app-sidebar) {
+    padding: 84px 16px 48px;
+  }
+}
+
+/* =========================================================
+   Welcome hero (first thing shown on User / Institution / Admin home)
+   ========================================================= */
+.welcome-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px 28px;
+  margin-bottom: 20px;
+  border-radius: var(--radius);
+  color: #ffffff;
+  background: radial-gradient(520px 260px at 100% -20%, rgba(231, 195, 116, 0.22), transparent 60%),
+              linear-gradient(120deg, var(--ink-2) 0%, var(--ink) 55%, var(--accent-solid) 130%);
+  box-shadow: 0 22px 44px -20px rgba(14, 26, 28, 0.5), inset 0 0 0 1px rgba(231, 195, 116, 0.1);
+}
+
+.welcome-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+.welcome-title {
+  margin: 0 0 6px;
+  font-size: 26px;
+  /* Explicit high-contrast white (never the dark --text/--ink tokens) so
+     this heading always stays readable against the dark hero gradient
+     behind it, in every theme.
+
+     IMPORTANT: the global `h1` rule below paints text with a dark-green
+     gradient via `background-clip: text` + `-webkit-text-fill-color:
+     transparent`. Those are separate properties from `color`, so simply
+     setting `color: #fff` here does NOT override them - the dark gradient
+     fill was still winning, which is exactly why "Admin overview" and
+     "Welcome back" rendered as near-invisible dark-green-on-dark-background
+     text. Explicitly reset the gradient/clip/fill properties here so this
+     heading is a solid, opaque white.
+  */
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.welcome-sub {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 620px) {
+  .welcome-hero { padding: 22px 20px; }
+  .welcome-title { font-size: 21px; }
+}
+
+/* ---- Admin home: quick stats + quick-action tiles ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 16px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-tile-value {
+  font-family: 'Sora', 'Inter', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-tile-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.quick-actions-heading {
+  margin: 6px 2px 12px;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.quick-action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.quick-action-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  text-decoration: none;
+}
+
+.quick-action-icon { font-size: 22px; }
+
+.quick-action-title {
+  font-family: 'Sora', 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.quick-action-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* =========================================================
+   Back button (form pages, e.g. Add/Edit Item)
+   ========================================================= */
+.form-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.back-button {
+  width: auto;
+  margin: 0;
+  padding: 9px 16px 9px 12px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.back-button:hover {
+  background: #f4f7f6;
+  border-color: rgba(14, 26, 28, 0.24);
+  transform: translateX(-2px);
+}
+
+/* =========================================================
+   Item tile action row (Edit / Remove)
+   ========================================================= */
+.item-tile-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.item-tile-actions button { width: auto; margin: 0; }
+
+/* =========================================================
+   Tab switch (e.g. New Customer vs Existing User)
+   ========================================================= */
+.tab-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  background: #eef3f2;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.tab-switch button {
+  flex: 1 1 auto;
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+}
+.tab-switch button:hover { transform: none; filter: none; box-shadow: none; color: var(--text); }
+.tab-switch button.active {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: white;
+  box-shadow: 0 6px 16px -6px rgba(15, 118, 110, 0.6);
+}
+
+/* Existing-user lookup preview card inside the Register Customer modal */
+.user-preview-box {
+  background: rgba(15, 118, 110, 0.05);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.user-preview-box strong { display: block; font-size: 14.5px; color: var(--text); }
+
+/* =========================================================
+   Toast notification (e.g. "Credentials Updated Successfully")
+   ========================================================= */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  font-size: 14px;
+  font-weight: 600;
+  animation: overlayIn 0.2s ease both;
+  max-width: 92vw;
+}
+.toast-success { border: 1.5px solid rgba(22, 163, 74, 0.35); color: #15803d; }
+.toast-error { border: 1.5px solid rgba(220, 38, 38, 0.35); color: #b91c1c; }
+.toast-icon { font-size: 16px; }
+.toast-message { flex: 1 1 auto; }
+.toast-close {
+  width: auto;
+  margin: 0;
+  padding: 2px 6px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.toast-close:hover { transform: none; filter: none; box-shadow: none; opacity: 0.7; }
+
+/* =========================================================
+   Mobile money provider list - its own clean, clearly visible,
+   separately organized section (not a plain <select> mixed with
+   unrelated fields).
+   ========================================================= */
+.provider-section {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: #f4f7f6;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.provider-section-label {
+  margin-bottom: 10px;
+}
+.provider-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+.provider-option {
+  width: auto;
+  margin: 0;
+  padding: 10px 8px;
+  background: #ffffff;
+  border: 1.5px solid rgba(14, 26, 28, 0.14);
+  box-shadow: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 10px;
+  text-align: center;
+}
+.provider-option:hover {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+  border-color: var(--border-hover);
+}
+.provider-option.selected {
+  background: rgba(15, 118, 110, 0.08);
+  border-color: var(--accent);
+  color: var(--accent-solid);
+}
+
+@media (max-width: 420px) {
+  .provider-list { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+}
+
+/* =========================================================
+   Payment terminal "back to home" link
+   ========================================================= */
+.terminal-home-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.terminal-home-link:hover { color: var(--accent); }
+.terminal-home-link-block {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.terminal-home-link-block:hover {
+  background: #f4f7f6;
+  text-decoration: none;
+}
+
+/* =========================================================
+   Payment terminal tap-circle status states (uses theme vars,
+   not hardcoded hex, so it stays consistent with the light theme)
+   ========================================================= */
+.tap-circle-idle { border-color: rgba(231, 195, 116, 0.55); }
+.tap-circle-processing {
+  border-color: rgba(217, 119, 6, 0.6);
+}
+.tap-circle-processing::before,
+.tap-circle-processing::after { border-color: rgba(217, 119, 6, 0.55); animation-duration: 1.1s; }
+.tap-circle-success {
+  border-color: var(--success);
+  background: radial-gradient(circle at 32% 28%, #14532d 0%, #052e12 72%);
+}
+.tap-circle-success::before,
+.tap-circle-success::after { border-color: rgba(22, 163, 74, 0.55); animation: none; opacity: 0; }
+.tap-circle-error {
+  border-color: var(--danger);
+  background: radial-gradient(circle at 32% 28%, #450a0a 0%, #1f0505 72%);
+}
+.tap-circle-error::before,
+.tap-circle-error::after { animation: none; opacity: 0; }
+
+/* Card was successfully read and a customer was found - waiting on the
+   seller to press Confirm Payment. */
+.tap-circle-confirm {
+  border-color: var(--success);
+  background: radial-gradient(circle at 32% 28%, #14532d 0%, #052e12 72%);
+}
+.tap-circle-confirm::before,
+.tap-circle-confirm::after { border-color: rgba(22, 163, 74, 0.55); animation: none; opacity: 0; }
+
+/* =========================================================
+   Masked balance (hidden by default, revealed on tap - matches
+   mobile-banking / P2P balance-privacy conventions)
+   ========================================================= */
+.masked-balance-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.balance-toggle {
+  width: auto;
+  margin: 0;
+  padding: 6px 10px;
+  background: #f4f7f6;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  font-size: 16px;
+  border-radius: 999px;
+  line-height: 1;
+}
+.balance-toggle:hover {
+  transform: none;
+  filter: none;
+  box-shadow: none;
+  background: #eef3f2;
+}
+
+/* =========================================================
+   All Registered Customers table
+   ========================================================= */
+.customer-table-wrap { overflow-x: auto; margin-top: 14px; }
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.customer-table th {
+  text-align: left;
+  padding: 10px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.customer-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.customer-table tr:last-child td { border-bottom: none; }
+
+/* =========================================================
+   Pagination bar (used across the admin list/search pages)
+   ========================================================= */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.pagination-info { color: var(--muted-2); font-size: 12.5px; }
+.pagination-controls { display: flex; align-items: center; gap: 10px; }
+.pagination-controls button { padding: 7px 14px; font-size: 13px; }
+.pagination-page { font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+/* =========================================================
+   Payment Terminal card (on the Items page) - a real call-to-action
+   button, not a plain hyperlink sitting on its own.
+   ========================================================= */
+.payment-terminal-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-solid) 55%, var(--accent) 100%);
+  border: 1px solid rgba(15, 118, 110, 0.35);
+  box-shadow: 0 18px 40px -22px rgba(5, 33, 31, 0.55);
+}
+/* Faint tap-wave decoration in the background, purely visual. */
+.payment-terminal-card::after {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(23, 201, 168, 0.28) 0%, rgba(23, 201, 168, 0) 70%);
+  pointer-events: none;
+}
+.payment-terminal-live {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #6ee7b7;
+  background: rgba(6, 78, 59, 0.55);
+  border: 1px solid rgba(110, 231, 183, 0.35);
+  padding: 4px 9px;
+  border-radius: 999px;
+}
+.payment-terminal-icon {
+  width: 60px;
+  height: 60px;
+  flex: 0 0 auto;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  z-index: 1;
+}
+.payment-terminal-copy { flex: 1 1 280px; min-width: 0; z-index: 1; }
+.payment-terminal-copy h3 { color: #ffffff; }
+.payment-terminal-copy p.muted { color: rgba(255, 255, 255, 0.72); }
+.payment-terminal-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.payment-terminal-path {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f0d6a0;
+}
+.payment-terminal-copy-btn {
+  width: auto;
+  padding: 5px 12px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  margin-top: 0;
+}
+.payment-terminal-copy-btn:hover { background: rgba(255, 255, 255, 0.18); }
+.payment-terminal-btn-link { flex: 0 0 auto; text-decoration: none; z-index: 1; }
+.payment-terminal-btn {
+  width: auto;
+  white-space: nowrap;
+  padding: 13px 22px;
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+  color: var(--accent-deep);
+  box-shadow: 0 10px 24px -10px rgba(203, 154, 61, 0.55);
+}
+.payment-terminal-btn:hover { filter: brightness(1.03); }
+@media (max-width: 600px) {
+  .payment-terminal-card { flex-direction: column; align-items: stretch; text-align: center; }
+  .payment-terminal-live { position: static; align-self: center; }
+  .payment-terminal-link-row { justify-content: center; }
+  .payment-terminal-btn-link { width: 100%; }
+  .payment-terminal-btn { width: 100%; }
+}
+
+/* =========================================================
+   Global site footer - shown at the bottom of every real page.
+   Sits inside the same `.page`/`.page-wide` container as the rest of the
+   content, so on dashboard screens it naturally lands to the right of the
+   fixed sidebar and lines up with everything above it.
+   ========================================================= */
+.app-footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  max-width: 780px;
+}
+
+.app-footer-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  margin-bottom: 16px;
+}
+
+.app-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-footer-brand p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.app-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+}
+
+.app-footer-links a,
+.app-footer-links span {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.app-footer-links a:hover {
+  color: var(--accent-solid);
+  text-decoration: underline;
+}
+
+.app-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted-2);
+}
+
+.app-footer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--accent-solid);
+}
+
+@media (max-width: 560px) {
+  .app-footer-top { flex-direction: column; gap: 14px; }
+  .app-footer-bottom { flex-direction: column; align-items: flex-start; }
+}
+
+/* Compact single-line variant used on standalone auth screens (Login,
+   Forgot/Reset Password, Change Credentials) so it doesn't compete with
+   the form for attention. */
+.app-footer-compact {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.app-footer-compact-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted-2);
+  text-align: center;
+}
+
+.app-footer-compact-inner a {
+  color: var(--muted-2);
+  text-decoration: none;
+}
+
+.app-footer-compact-inner a:hover {
+  color: var(--accent-solid);
+  text-decoration: underline;
+}
+
+.app-footer-dot { opacity: 0.6; }
+
+/* On the dashboard shell, the sidebar/topbar are position:fixed and this
+   footer lives inside the same scrolling `.page` content column as
+   everything else, so no extra offset is needed - it just flows after the
+   last card. */
+.page:has(> .app-sidebar) .app-footer,
+.page-wide:has(> .app-sidebar) .app-footer {
+  margin-top: 40px;
+}
+
+/* =========================================================
+   Transaction type filter chips (Institution Activity, User Transactions)
+   ========================================================= */
+.tx-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 16px;
+}
+.tx-filter-chip {
+  width: auto;
+  margin-top: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tx-filter-chip:hover {
+  transform: none;
+  box-shadow: none;
+  filter: none;
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.tx-filter-chip.active {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  border-color: transparent;
+  color: #ffffff;
+}
+.tx-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(11, 23, 23, 0.08);
+  color: inherit;
+}
+.tx-filter-chip.active .tx-filter-count {
+  background: rgba(255, 255, 255, 0.25);
+}
